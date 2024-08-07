@@ -1,0 +1,4 @@
+include/mmtmhasparserlib/version.h
+build/
+.DS_Store
+.vscode/
