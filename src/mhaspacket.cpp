@@ -230,10 +230,20 @@ CUniqueMhasPacket CMhasPacket::s_parseNextPacket(ilo::ByteBuffer::const_iterator
   uint64_t packetLength = 0;
 
   try {
+    if (!canReadEscapedValue(bitBuffer, 3, 8, 8)) {
+      return nullptr;
+    }
     packetType = static_cast<EMhasPacketType>(readEscapedValue(bitBuffer, 3, 8, 8));
 
+    if (!canReadEscapedValue(bitBuffer, 2, 8, 32)) {
+      return nullptr;
+    }
     // Parse packet label -> will later be reparsed
     readEscapedValue(bitBuffer, 2, 8, 32);
+
+    if (!canReadEscapedValue(bitBuffer, 11, 24, 24)) {
+      return nullptr;
+    }
     packetLength = readEscapedValue(bitBuffer, 11, 24, 24);
   } catch (const std::exception& /*e*/) {
     return nullptr;
@@ -284,16 +294,18 @@ std::string CMhasPacket::toString(bool dumpPayload) {
          << ", Header-Length: " << calculatePacketSize() - m_payload.size();
 
   if (dumpPayload) {
-    stream << ", Payload:";
+    stream << ", Payload: ";
 
     for (auto byte : m_payload) {
-      stream << " 0x" << std::hex << static_cast<uint16_t>(byte) << std::dec;
+      stream << "0x" << std::hex << static_cast<uint16_t>(byte) << std::dec;
     }
+  } else {
+    stream << std::endl;
   }
 
   std::string specificInfo = packetSpecificInfo();
   if (!specificInfo.empty()) {
-    stream << "\n - Packet specific info: " << specificInfo;
+    stream << " - Packet specific info: " << specificInfo << std::endl;
   }
 
   return stream.str();

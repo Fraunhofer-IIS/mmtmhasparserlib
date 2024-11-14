@@ -81,6 +81,7 @@ amm-info@iis.fraunhofer.de
 -----------------------------------------------------------------------------*/
 
 // System includes
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -199,7 +200,7 @@ int main(int argc, char* argv[]) {
 
   if (argc != 2) {
     printUsage();
-    return -1;
+    return EXIT_FAILURE;
   }
 
   std::string inputFile(argv[1]);
@@ -208,7 +209,7 @@ int main(int argc, char* argv[]) {
 
   if (!inStream) {
     std::cout << "Error opening input file: " << inputFile << std::endl;
-    return -1;
+    return EXIT_FAILURE;
   }
 
   ilo::ByteBuffer buffer(8192);
@@ -342,5 +343,5 @@ int main(int argc, char* argv[]) {
     std::cout << std::endl;
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 }

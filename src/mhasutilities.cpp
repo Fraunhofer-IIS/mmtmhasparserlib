@@ -87,14 +87,49 @@ amm-info@iis.fraunhofer.de
 #include "logging.h"
 #include "mmtmhasparserlib/mhasutilities.h"
 
+bool mmt::mhasparserlib::canReadEscapedValue(ilo::CBitParser& bitParser, uint8_t first,
+                                             uint8_t second, uint8_t third) {
+  if (first > 63 || second > 63 || third > 63) {
+    return false;
+  }
+
+  auto pos = bitParser.tell();
+
+  if (bitParser.nofBitsLeft() < first) {
+    bitParser.seek(pos, ilo::EPosType::begin);
+    return false;
+  }
+
+  uint64_t value = bitParser.read<uint64_t>(first);
+
+  if (value == (uint64_t(1) << first) - 1) {
+    if (bitParser.nofBitsLeft() < second) {
+      bitParser.seek(pos, ilo::EPosType::begin);
+      return false;
+    }
+
+    auto valueAdd = bitParser.read<uint64_t>(second);
+
+    value += valueAdd;
+    if (valueAdd == (uint64_t(1) << second) - 1) {
+      if (bitParser.nofBitsLeft() < third) {
+        bitParser.seek(pos, ilo::EPosType::begin);
+        return false;
+      }
+    }
+  }
+
+  bitParser.seek(pos, ilo::EPosType::begin);
+  return true;
+}
+
 uint64_t mmt::mhasparserlib::readEscapedValue(ilo::CBitParser& bitParser, uint8_t first,
                                               uint8_t second, uint8_t third) {
   ILO_ASSERT(first <= 63, "Bit count for escaped value too large.");
   ILO_ASSERT(second <= 63, "Bit count for escaped value too large.");
   ILO_ASSERT(third <= 63, "Bit count for escaped value too large.");
 
-  uint64_t value = 0;
-  value = bitParser.read<uint64_t>(first);
+  uint64_t value = bitParser.read<uint64_t>(first);
 
   if (value == (uint64_t(1) << first) - 1) {
     uint64_t valueAdd = 0;

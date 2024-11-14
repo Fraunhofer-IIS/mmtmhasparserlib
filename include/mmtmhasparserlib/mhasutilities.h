@@ -96,6 +96,11 @@ amm-info@iis.fraunhofer.de
 
 namespace mmt {
 namespace mhasparserlib {
+
+//! Checks whether an escaped value as defined in ISO/IEC 23003-3:2012, 5.2, Table 16 can be read
+//! without running out of data.
+bool canReadEscapedValue(ilo::CBitParser& bitParser, uint8_t first, uint8_t second, uint8_t third);
+
 //! Reads an escaped value as defined in ISO/IEC 23003-3:2012, 5.2, Table 16.
 uint64_t readEscapedValue(ilo::CBitParser& bitParser, uint8_t first, uint8_t second, uint8_t third);
 

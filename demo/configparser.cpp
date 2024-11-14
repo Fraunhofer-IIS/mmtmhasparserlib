@@ -81,6 +81,7 @@ amm-info@iis.fraunhofer.de
 -----------------------------------------------------------------------------*/
 
 // System includes
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -111,7 +112,7 @@ int main(int argc, char** argv) {
 
   if (!inStream) {
     std::cout << "Error opening input file: " << inputFile << std::endl;
-    return -1;
+    return EXIT_FAILURE;
   }
 
   std::map<uint64_t, uint16_t> crc16map;
@@ -228,5 +229,5 @@ int main(int argc, char** argv) {
       }
     }
   }
-  return 0;
+  return EXIT_SUCCESS;
 }

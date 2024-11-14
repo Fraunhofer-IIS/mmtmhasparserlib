@@ -82,6 +82,7 @@ amm-info@iis.fraunhofer.de
 
 // System includes
 #include <cinttypes>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <map>

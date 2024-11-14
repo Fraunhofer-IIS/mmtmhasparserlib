@@ -81,6 +81,7 @@ amm-info@iis.fraunhofer.de
 -----------------------------------------------------------------------------*/
 
 // System includes
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -99,7 +100,7 @@ using namespace mmt::isobmff;
 int main(int argc, char** argv) {
   if (argc != 2) {
     std::cout << "Usage: <mhmparser> <input file>" << std::endl;
-    return -1;
+    return EXIT_FAILURE;
   }
 
   // Redirect mmtisobmff logs to syslog
@@ -148,5 +149,5 @@ int main(int argc, char** argv) {
 
   std::cout << "\n--------------- End ---------------" << std::endl;
   std::cout << " * Total audio duration (in track timescale): " << totDuration << std::endl;
-  return 0;
+  return EXIT_SUCCESS;
 }
