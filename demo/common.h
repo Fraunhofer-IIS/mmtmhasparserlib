@@ -91,6 +91,8 @@ amm-info@iis.fraunhofer.de
 // External includes
 #include "ilo/common_types.h"
 #include "mmtisobmff/reader/trackreader.h"
+#include "mmtisobmff/writer/trackwriter.h"
+#include "mmtisobmff/writer/writer.h"
 
 // Internal includes
 #include "mmtmhasparserlib/mhaspacket.h"
@@ -148,5 +150,21 @@ class CFileInputMp4 {
 
 using CUniqueInputMp4 = std::unique_ptr<CFileInputMp4>;
 using CVectorInputMp4 = std::vector<CUniqueInputMp4>;
+
+class CMhmOutput {
+ public:
+  CMhmOutput(std::unique_ptr<mmt::isobmff::CIsobmffWriter>&& writer, uint32_t sampleRate,
+             bool allowMultistream, const std::vector<uint8_t>& compatibleProfileLevels = {});
+  CMhmOutput(const std::string& outputFile, uint32_t sampleRate, bool allowMultistream,
+             const std::vector<uint8_t>& compatibleProfileLevels = {});
+
+  void writeSample(const ilo::ByteBuffer& sample, uint32_t duration, bool isIPF);
+  void writeSample(CPacketDeque&& packets, uint32_t duration, bool isIPF);
+
+ private:
+  std::unique_ptr<mmt::isobmff::CIsobmffWriter> m_writer = nullptr;
+  std::unique_ptr<mmt::isobmff::ITrackWriter> m_trackWriter;
+  mmt::isobmff::CSample m_sample;
+};
 }  // namespace mhasparserlib
 }  // namespace mmt

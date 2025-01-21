@@ -88,11 +88,13 @@ amm-info@iis.fraunhofer.de
 
 // External includes
 #include "ilo/memory.h"
+#include "mmtisobmff/helper/commonhelpertools.h"
 #include "mmtisobmff/reader/input.h"
 #include "mmtisobmff/reader/reader.h"
 
 // Internal includes
 #include "common.h"
+#include "mmtmhasparserlib/mhashelpertools.h"
 
 using namespace mmt::mhasparserlib;
 using namespace mmt::isobmff;
@@ -168,9 +170,11 @@ CFileInputMp4::CFileInputMp4(const std::string& fileName) : m_ptsOfCurrrentSampl
 CSample CFileInputMp4::currentSample() const {
   return m_currentSample;
 }
+
 uint32_t CFileInputMp4::timescale() const {
   return m_trackTimescale;
 }
+
 uint64_t CFileInputMp4::ptsOfCurrentSample() const {
   return m_ptsOfCurrrentSample;
 }
@@ -183,4 +187,61 @@ bool CFileInputMp4::nextSample() {
 
 bool CFileInputMp4::checkEndOfFile() const {
   return m_currentSample.rawData.empty();
+}
+
+static std::unique_ptr<mmt::isobmff::CIsobmffWriter> openFileWriter(const std::string& outputFile) {
+  mmt::isobmff::CIsobmffFileWriter::SOutputConfig outConf;
+  outConf.outputUri = outputFile;
+
+  // Writer Configuration
+  mmt::isobmff::SMovieConfig movieConfig;
+  // Default values for the compatible brands and the major brand
+  movieConfig.compatibleBrands = {ilo::toFcc("mp42")};
+  movieConfig.majorBrand = ilo::toFcc("mp42");
+
+  return ilo::make_unique<mmt::isobmff::CIsobmffFileWriter>(outConf, movieConfig);
+}
+
+CMhmOutput::CMhmOutput(std::unique_ptr<mmt::isobmff::CIsobmffWriter>&& writer, uint32_t sampleRate,
+                       bool allowMultistream, const std::vector<uint8_t>& compatibleProfileLevels)
+    : m_writer(std::move(writer)) {
+  mmt::isobmff::tools::SEasyTrackConfig config{};
+  config.sampleRate = sampleRate;
+  config.channelCount = 0;
+  config.codecType = allowMultistream ? ilo::toFcc("mhm2") : ilo::toFcc("mhm1");
+  config.timescale = sampleRate;
+  config.compatibleProfileLevels = compatibleProfileLevels;
+
+  m_trackWriter = mmt::isobmff::tools::createTrackWriter(*m_writer, config);
+}
+
+CMhmOutput::CMhmOutput(const std::string& outputFile, uint32_t sampleRate, bool allowMultistream,
+                       const std::vector<uint8_t>& compatibleProfileLevels)
+    : CMhmOutput(openFileWriter(outputFile), sampleRate, allowMultistream,
+                 compatibleProfileLevels) {}
+
+void CMhmOutput::writeSample(const ilo::ByteBuffer& sample, uint32_t duration, bool isIPF) {
+  m_sample.duration = duration;
+  m_sample.isSyncSample = isIPF;
+  m_sample.rawData = sample;
+
+  m_trackWriter->addSample(m_sample);
+}
+
+void CMhmOutput::writeSample(CPacketDeque&& packets, uint32_t duration, bool isIPF) {
+  // filter CRC packets since they are not allowed in an MP4 file
+  packets.erase(std::remove_if(packets.begin(), packets.end(),
+                               [](CUniqueMhasPacket& packet) {
+                                 auto packetType =
+                                     static_cast<EMhasPacketType>(packet->packetType());
+                                 return packetType == EMhasPacketType::PACTYP_CRC16 ||
+                                        packetType == EMhasPacketType::PACTYP_CRC32 ||
+                                        packetType == EMhasPacketType::PACTYP_GLOBAL_CRC16 ||
+                                        packetType == EMhasPacketType::PACTYP_GLOBAL_CRC32;
+                               }),
+                packets.end());
+
+  ilo::ByteBuffer buffer{};
+  tools::writePacketsToByteBuffer(packets, buffer);
+  writeSample(buffer, duration, isIPF);
 }
