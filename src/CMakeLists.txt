@@ -19,6 +19,7 @@ add_library(mmtmhasparserlib STATIC
   ${PROJECT_SOURCE_DIR}/include/mmtmhasparserlib/mhashelpertools.h
   ${PROJECT_SOURCE_DIR}/include/mmtmhasparserlib/mhasinfowrapper.h
   ${PROJECT_SOURCE_DIR}/include/mmtmhasparserlib/mhasutilities.h
+  ${PROJECT_SOURCE_DIR}/include/mmtmhasparserlib/mhaspacketizer.h
   ${PROJECT_SOURCE_DIR}/include/mmtmhasparserlib/pesparser.h
   logging.h
   mhasparser.cpp
@@ -33,6 +34,7 @@ add_library(mmtmhasparserlib STATIC
   mhashelpertools.cpp
   mhasinfowrapper.cpp
   mhasutilities.cpp
+  mhaspacketizer.cpp
   pesparser.cpp
 )
 target_compile_features(mmtaudioparser PUBLIC cxx_std_11)

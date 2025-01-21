@@ -113,9 +113,9 @@ using namespace mmt::mhasparserlib;
 
 const std::map<EMhasPacketType, uint32_t> mmt::mhasparserlib::IPF_PACKETS_ORDER{
     {EMhasPacketType::PACTYP_SYNC, 0},
-    {EMhasPacketType::PACTYP_MARKER, 8},
-    {EMhasPacketType::PACTYP_MPEGH3DACFG, 1},
-    {EMhasPacketType::PACTYP_AUDIOSCENEINFO, 2},
+    {EMhasPacketType::PACTYP_MARKER, 1},
+    {EMhasPacketType::PACTYP_MPEGH3DACFG, 2},
+    {EMhasPacketType::PACTYP_AUDIOSCENEINFO, 3},
     {EMhasPacketType::PACTYP_AUDIOTRUNCATION, 4},
     {EMhasPacketType::PACTYP_MPEGH3DAFRAME, 5}};
 

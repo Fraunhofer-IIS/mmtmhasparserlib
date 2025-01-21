@@ -135,7 +135,8 @@ class CMhasTruncationPacket final : public CMhasPacket {
 
   //! Sets the active (see @ref isActive) flag of this truncation.
   void setActive(bool isActive);
-  //! Sets whether the truncation is located at the beginning (true) or end (false) of the packet.
+  //! Sets whether samples are truncated from the beginning(true) or the end (false) of the frame
+  //! following this packet.
   void truncateFromBegin(bool truncFromBegin);
   //! Sets the number of truncated samples.
   void truncatedSamples(uint16_t truncatedSamples);
