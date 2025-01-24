@@ -3,7 +3,7 @@ include(FetchContent)
 
 include_guard()
 
-project(mmtmhasparserlib VERSION 1.0.0)
+project(mmtmhasparserlib VERSION 1.1.0)
 
 # Set output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -40,3 +40,4 @@ endif()
 if(mmtmhasparserlib_BUILD_DOC)
   add_subdirectory(doc)
 endif()
+
